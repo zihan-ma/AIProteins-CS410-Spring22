@@ -1,1 +1,1 @@
-# CS410firststeps
+# AI Proteins
