@@ -1,15 +1,15 @@
 # AI Proteins
-Software version 1.0.0
+Software version 1.0.0  
 
-## Running required Modules:
+## Running required Modules:  
 
-Anaconda verson == xxx  
-Python verson == xxx  
+Anaconda verson == 4.10.3  
+Python verson == 3.9.7  
 Jupyter Notebook == xxx  
 xxx verson == xxx  
 xxx verson == xxx  
 
-## Chimera script
+## Chimera script:  
 
 #### Allocate resource on chimera  
 
