@@ -3,6 +3,7 @@
     Author: Francisco Benavides
 """
 
+#from sqlite3 import adapt
 import numpy as np
 import tensorflow as tf
 import seaborn
@@ -13,8 +14,10 @@ from tensorflow import keras
 from tensorflow.keras import utils
 from tensorflow.keras.layers import BatchNormalization, Dense
 from tensorflow.keras.models import Sequential
-
 import matplotlib.pyplot as plt
+
+#import Disulfide_Parser
+
 
 """
     This is a standard Dense Layer classification model.
@@ -29,19 +32,27 @@ def load_data():
     Call PDB parser here
     """
 
-
-    data = None
-    labels = None
-    return [data, labels]
+    data = Disulfide_Parser.adapter()
+    
+    features = np.copy(data[:, 0:4])
+    labels = np.copy(data[:, 4])
+    
+    return [features, labels]
 
 # normalize the dataset 
 # X = (x[i] - mean) / standard_diviation
 def feature_scaling(dataset):
     data = dataset[0]
+    print(len(data))
+    print(data.shape)
     for i in range(len(data)):
-        mean = np.mean(data[:, i])
-        sd = np.std(data[:, i])
-        data[:,i] = (data[:,i] - mean) / sd
+        mean = np.mean(data[i, :])
+        sd = np.std(data[i, :])
+        data[i,:] = (data[i,:] - mean) / sd
+
+        #mean = np.mean(data[:, i])
+        #sd = np.std(data[:, i])
+        #data[:,i] = (data[:,i] - mean) / sd
     
     dataset = [data, dataset[1]]
     return dataset
@@ -100,7 +111,8 @@ def compare_results(raw_predictions, y_test):
 
     for i in range(len(raw_predictions)):
         j = np.where(raw_predictions[i,:] == max(raw_predictions[i,:]))
-        x = [0., 0., 0.] #np.zeros(3)
+        #x = [0., 0., 0.] #np.zeros(3)
+        x = [0., 0.]
         x[j[0][0]] = 1.
         if np.array_equal(y_test[i,:], x):
             correct += 1
@@ -115,15 +127,19 @@ def util_helper(y_pred, y_test):
     new_y_test = []
 
     for i in range(len(y_pred)):
-        if np.array_equal(y_test[i,:], np.array([1, 0, 0])):
+        #if np.array_equal(y_test[i,:], np.array([1, 0, 0])):
+        if np.array_equal(y_test[i,:], np.array([1, 0])):
             new_y_test.append(0)
             
-        if np.array_equal(y_test[i,:], np.array([0, 1, 0])):
+        #if np.array_equal(y_test[i,:], np.array([0, 1, 0])):
+        if np.array_equal(y_test[i,:], np.array([0, 1])):
             new_y_test.append(1)
             
+        """
         if np.array_equal(y_test[i,:], np.array([0, 0, 1])):
             new_y_test.append(2)
-    
+        """
+
     return new_y_test
 
 
@@ -155,18 +171,18 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
         num_epochs = 1
         batch_size = 1
     else:
-        num_epochs = 3
+        num_epochs = 5
         batch_size = 100
 
     eta = learning_rate
     
     decay_factor = 0.95
 
-    size_hidden = ... # nodes per layer
+    size_hidden = 100 # nodes per layer
 
     # static parameters
-    size_input = ... # number of features
-    size_output =  ... # number of labels
+    size_input = 4 # number of features
+    size_output =  2 # number of labels
     Input_shape = (size_input,)
 
     # model:
@@ -179,6 +195,9 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
             Dense(size_hidden, activation=activation_function, name='hidden_layer01'),
             BatchNormalization(),
             Dense(size_hidden, activation=activation_function, name='hidden_layer02'),
+            #Dense(size_hidden, activation=activation_function, name='hidden_layer03'),
+            #Dense(size_hidden, activation=activation_function, name='hidden_layer04'),
+            #Dense(size_hidden, activation=activation_function, name='hidden_layer05'),
 
             # Dense(size_hidden, activation=activation_function, name='hidden_layerXX'),
             
@@ -188,6 +207,10 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
         model = Sequential([
             keras.Input(shape=Input_shape, name='input_layer'),
             Dense(size_hidden, activation=activation_function, name='hidden_layer01'),
+            Dense(size_hidden, activation=activation_function, name='hidden_layer02'),
+            #Dense(size_hidden, activation=activation_function, name='hidden_layer03'),
+            #Dense(size_hidden, activation=activation_function, name='hidden_layer04'),
+            #Dense(size_hidden, activation=activation_function, name='hidden_layer05'),
             
             # Dense(size_hidden, activation=activation_function, name='hidden_layerXX'),
             
@@ -283,10 +306,11 @@ def roc_graph(prediction_info, extra=""):
     auc1 = metrics.auc(fpr1, tpr1)
     plt.plot(fpr1, tpr1, color="gold", lw=3, label="ROC curve of class {0} (area = {1:0.2f})".format(1, auc1))
     
-
+    """
     fpr2, tpr2, thresholds2 = metrics.roc_curve(y_test[:, 2], y_pred[:, 2])
     auc2 = metrics.auc(fpr2, tpr2)
     plt.plot(fpr2, tpr2, color="green", lw=2, label="ROC curve of class {0} (area = {1:0.2f})".format(2, auc2))
+    """
 
     plt.title("ROC Graph " + extra)
     plt.xlabel("False Positive Rate")
@@ -311,10 +335,11 @@ def multi_roc_graph(prediction_info1, prediction_info2, extra=""):
     auc1 = metrics.auc(fpr1, tpr1)
     plt.plot(fpr1, tpr1, color="red", lw=3, label="Model 1 ROC curve of class {0} (area = {1:0.2f})".format(1, auc1))
     
+    """
     fpr2, tpr2, thresholds2 = metrics.roc_curve(y_test1[:, 2], y_pred1[:, 2])
     auc2 = metrics.auc(fpr2, tpr2)
     plt.plot(fpr2, tpr2, color="lightcoral", lw=3, label="Model 1 ROC curve of class {0} (area = {1:0.2f})".format(2, auc2))
-
+    """
 
     fpr0, tpr0, thresholds0 = metrics.roc_curve(y_test2[:, 0], y_pred2[:, 0])
     auc0 = metrics.auc(fpr0, tpr0)
@@ -324,9 +349,11 @@ def multi_roc_graph(prediction_info1, prediction_info2, extra=""):
     auc1 = metrics.auc(fpr1, tpr1)
     plt.plot(fpr1, tpr1, color="blue", lw=2, label="Model 2 ROC curve of class {0} (area = {1:0.2f})".format(1, auc1))
     
+    """"
     fpr2, tpr2, thresholds2 = metrics.roc_curve(y_test2[:, 2], y_pred2[:, 2])
     auc2 = metrics.auc(fpr2, tpr2)
     plt.plot(fpr2, tpr2, color="skyblue", lw=2, label="Model 2 ROC curve of class {0} (area = {1:0.2f})".format(2, auc2))
+    """
 
     plt.title("ROC Comparison Graph " + extra)
     plt.xlabel("False Positive Rate")
@@ -346,12 +373,12 @@ def confusion_matrix(prediction_info):
     ax = seaborn.heatmap(cf_matrix/np.sum(cf_matrix), annot=True, fmt='.2%', cmap='Reds')
 
     ax.set_title('Confusion Matrix\n')
-    ax.set_xlabel('\nPredicted Location')
-    ax.set_ylabel('Actual Location')
+    #ax.set_xlabel('\nPredicted Location')
+    #ax.set_ylabel('Actual Location')
 
     # Ticket labels - List must be in alphabetical order
-    ax.xaxis.set_ticklabels(["""FILL IN"""])
-    ax.yaxis.set_ticklabels(["""FILL IN"""])
+    #ax.xaxis.set_ticklabels(["""FILL IN"""])
+    #ax.yaxis.set_ticklabels(["""FILL IN"""])
 
     # Display the visualization of the Confusion Matrix.
     plt.show()
@@ -395,7 +422,7 @@ def main():
     Models beyond this point have feature scaling enabled
 
     """
-    feature_scaled_dataset = feature_scaling(dataset) # normalize the data with feature scaling formula 
+    feature_scaled_dataset = feature_scaling(dataset) # normalize the data with feature scaling formula                                                 # FIX
     split_data = dataset_split(feature_scaled_dataset[0], feature_scaled_dataset[1])
 
 
@@ -406,7 +433,7 @@ def main():
     v_loss.append(NBYF[0].history['val_loss'][0])
     t_loss.append(NBYF[0].history['loss'][0])
 
-    
+
 
     """
 

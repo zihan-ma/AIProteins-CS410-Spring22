@@ -1,3 +1,4 @@
+from dis import dis
 import geometry 
 import parsers 
 import util 
@@ -12,7 +13,7 @@ def disulfide_parser():
     cys_pdb_list = np.empty((0, 3, 3))
 
     # Make sure to change directory to where PDBs are
-    path = "C:\\Users\\wwe61\\Downloads\\PDBs"
+    path = "C:\\Users\\name\\AIProteins-CS410-Spring22\\PDBs"
     dir_list = os.listdir(path)
     for x in dir_list:
         if x.endswith(".pdb"):
@@ -33,4 +34,47 @@ def disulfide_parser():
     return (0, c6d_ref.numpy()[0]), (1, cys_c6d_ref.numpy()[0])
 
 
-     
+"""
+Convert numpy format from (x, x, 4) to (y, 4) for neural network
+"""
+def adapter_utility(features: np.ndarray, label: int, dims: tuple) -> np.ndarray:
+    h, w, d = dims
+    listed = []
+    for i in range(h):
+        for j in range(w):
+            buffer = []
+            for k in range(d):
+                buffer.append(features[i, j, k])
+            buffer.append(label)
+            listed.append(buffer)
+    
+    return np.array(listed)
+
+def converter_utility(a1: np.ndarray, a2: np.ndarray) -> np.ndarray:
+    features = np.append(a1, a2, axis=0)
+
+    np.random.shuffle(features)
+    np.random.shuffle(features)
+    
+    return features
+
+def adapter() -> np.ndarray:
+    data = disulfide_parser()
+
+    # get labels
+    label0 = data[0][0]
+    label1 = data[1][0]
+    
+    # get features
+    raw_features0 = data[0][1]
+    raw_features1 = data[1][1]
+    
+    # convert feature shapes
+    features_and_labels0 = adapter_utility(raw_features0, label0, raw_features0.shape)
+    features_and_labels1 = adapter_utility(raw_features1, label1, raw_features1.shape)
+
+    # merge and shuffel
+    features_and_labels = converter_utility(features_and_labels0, features_and_labels1)
+
+    # [feature0, feature1, feature2, feature3, label]
+    return features_and_labels
