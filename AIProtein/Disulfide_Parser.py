@@ -149,3 +149,69 @@ def adapter() -> np.ndarray:
 
     # [feature0, feature1, feature2, feature3, label]
     return features_and_labels
+
+
+
+"""
+    keep the numpy array format but add an additional channel for the label (x, x, 5)
+    will make experimental trials with a 3D Convolution Volume.
+
+"""
+def callParser() -> tuple:
+
+    data = disulfide_parser()
+
+    # get features
+    raw_features0 = data[0][1]
+    raw_features1 = data[1][1]
+
+    labeled_data = addLabels(raw_features0, raw_features1)
+    nocys = labeled_data[0]
+    cys   = labeled_data[1]
+    shuffled_data = utility_shuffel3D(nocys, cys)
+    nocys_base = shuffled_data[0]
+    cys_base   = shuffled_data[1]
+    return (nocys_base, cys_base)
+
+
+def addLabels(nocys: np.ndarray, cys: np.ndarray) -> tuple:
+
+    h0, w0, d0 = nocys.shape
+    h1, w1, d1 = cys.shape
+    nocys = np.concatenate((nocys, np.zeros((h0, w0, 1))), axis=2)
+    cys   = np.concatenate((cys, np.ones((h1, w1, 1))), axis=2)
+
+
+    return (nocys, cys)
+
+def utility_shuffel3D(nocys: np.ndarray, cys: np.ndarray):
+    h0, w0, d0 = nocys.shape
+    h1, w1, d1 = cys.shape
+    if h0 != w0 or h1 != w1:
+        print("Error: 2D array shape does not match")
+        return
+    
+    # basis for shuffel
+    checker = 0
+    h, w = 0, 0
+    if h0 > h1:
+        checker = 0 # 0 == using nocys
+        h = h0
+        w = w0
+    elif h0 < h1:
+        checker = 1 # 1 == using cys
+        h = h1
+        w = w1
+    
+    for i in range(h):
+        for j in range(w):
+            if (checker == 0 and (i < h1 and j < w1)) or (checker == 1 and (i < h0 and j < w0)):
+                if np.random.uniform() > 0.5:
+
+                    x = np.copy(nocys[i,j,:])
+                    nocys[i,j,:] = cys[i,j,:]
+                    cys[i,j,:] = x
+
+
+
+    return (nocys, cys)

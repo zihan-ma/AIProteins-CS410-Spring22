@@ -3,7 +3,6 @@
     Author: Francisco Benavides
 """
 
-#from sqlite3 import adapt
 import numpy as np
 import tensorflow as tf
 import seaborn
@@ -16,6 +15,10 @@ from tensorflow.keras.layers import BatchNormalization, Dense
 from tensorflow.keras.models import Sequential
 import matplotlib.pyplot as plt
 
+"""
+ Id recommend moving this file into the AIProteins folder
+"""
+#from sqlite3 import adapt
 #import Disulfide_Parser
 
 
@@ -152,7 +155,7 @@ def util_helper(y_pred, y_test):
 """
 
 
-def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=False, activation_function='ReLU'):
+def neural_network(data, batchNormalize=True, learning_rate=0.000001, batch_training=False, activation_function='ReLU'):
 
     # load the data in.
     x_train = data[0]
@@ -171,14 +174,14 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
         num_epochs = 1
         batch_size = 1
     else:
-        num_epochs = 5
+        num_epochs = 25
         batch_size = 100
 
     eta = learning_rate
     
     decay_factor = 0.95
 
-    size_hidden = 100 # nodes per layer
+    size_hidden = 500 # nodes per layer
 
     # static parameters
     size_input = 4 # number of features
@@ -195,10 +198,10 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
             Dense(size_hidden, activation=activation_function, name='hidden_layer01'),
             BatchNormalization(),
             Dense(size_hidden, activation=activation_function, name='hidden_layer02'),
-            #Dense(size_hidden, activation=activation_function, name='hidden_layer03'),
-            #Dense(size_hidden, activation=activation_function, name='hidden_layer04'),
-            #Dense(size_hidden, activation=activation_function, name='hidden_layer05'),
-
+            Dense(size_hidden, activation=activation_function, name='hidden_layer03'),
+            Dense(size_hidden, activation=activation_function, name='hidden_layer04'),
+            Dense(size_hidden, activation=activation_function, name='hidden_layer05'),
+            
             # Dense(size_hidden, activation=activation_function, name='hidden_layerXX'),
             
             Dense(size_output, activation='softmax', name='output_layer')])
@@ -208,9 +211,9 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
             keras.Input(shape=Input_shape, name='input_layer'),
             Dense(size_hidden, activation=activation_function, name='hidden_layer01'),
             Dense(size_hidden, activation=activation_function, name='hidden_layer02'),
-            #Dense(size_hidden, activation=activation_function, name='hidden_layer03'),
-            #Dense(size_hidden, activation=activation_function, name='hidden_layer04'),
-            #Dense(size_hidden, activation=activation_function, name='hidden_layer05'),
+            Dense(size_hidden, activation=activation_function, name='hidden_layer03'),
+            Dense(size_hidden, activation=activation_function, name='hidden_layer04'),
+            Dense(size_hidden, activation=activation_function, name='hidden_layer05'),
             
             # Dense(size_hidden, activation=activation_function, name='hidden_layerXX'),
             
@@ -228,7 +231,7 @@ def neural_network(data, batchNormalize=True, learning_rate=0.1, batch_training=
     #setting up optimizers
     # using Sarcastic Gradient Decent
     learning_rate_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=eta, decay_steps=x_train.shape[0], decay_rate=decay_factor)
-    SGD_optimizer=keras.optimizers.SGD(learning_rate=learning_rate_schedule)
+    SGD_optimizer= tf.keras.optimizers.Adam(learning_rate=learning_rate_schedule) #keras.optimizers.SGD(learning_rate=learning_rate_schedule)
     
     # setting up model.
     model.compile(loss=keras.losses.categorical_crossentropy, optimizer=SGD_optimizer, metrics='accuracy')
@@ -305,12 +308,6 @@ def roc_graph(prediction_info, extra=""):
     fpr1, tpr1, thresholds1 = metrics.roc_curve(y_test[:, 1], y_pred[:, 1])
     auc1 = metrics.auc(fpr1, tpr1)
     plt.plot(fpr1, tpr1, color="gold", lw=3, label="ROC curve of class {0} (area = {1:0.2f})".format(1, auc1))
-    
-    """
-    fpr2, tpr2, thresholds2 = metrics.roc_curve(y_test[:, 2], y_pred[:, 2])
-    auc2 = metrics.auc(fpr2, tpr2)
-    plt.plot(fpr2, tpr2, color="green", lw=2, label="ROC curve of class {0} (area = {1:0.2f})".format(2, auc2))
-    """
 
     plt.title("ROC Graph " + extra)
     plt.xlabel("False Positive Rate")
@@ -335,12 +332,6 @@ def multi_roc_graph(prediction_info1, prediction_info2, extra=""):
     auc1 = metrics.auc(fpr1, tpr1)
     plt.plot(fpr1, tpr1, color="red", lw=3, label="Model 1 ROC curve of class {0} (area = {1:0.2f})".format(1, auc1))
     
-    """
-    fpr2, tpr2, thresholds2 = metrics.roc_curve(y_test1[:, 2], y_pred1[:, 2])
-    auc2 = metrics.auc(fpr2, tpr2)
-    plt.plot(fpr2, tpr2, color="lightcoral", lw=3, label="Model 1 ROC curve of class {0} (area = {1:0.2f})".format(2, auc2))
-    """
-
     fpr0, tpr0, thresholds0 = metrics.roc_curve(y_test2[:, 0], y_pred2[:, 0])
     auc0 = metrics.auc(fpr0, tpr0)
     plt.plot(fpr0, tpr0, color="navy", lw=2, label="Model 2 ROC curve of class {0} (area = {1:0.2f})".format(0, auc0))    
@@ -349,12 +340,6 @@ def multi_roc_graph(prediction_info1, prediction_info2, extra=""):
     auc1 = metrics.auc(fpr1, tpr1)
     plt.plot(fpr1, tpr1, color="blue", lw=2, label="Model 2 ROC curve of class {0} (area = {1:0.2f})".format(1, auc1))
     
-    """"
-    fpr2, tpr2, thresholds2 = metrics.roc_curve(y_test2[:, 2], y_pred2[:, 2])
-    auc2 = metrics.auc(fpr2, tpr2)
-    plt.plot(fpr2, tpr2, color="skyblue", lw=2, label="Model 2 ROC curve of class {0} (area = {1:0.2f})".format(2, auc2))
-    """
-
     plt.title("ROC Comparison Graph " + extra)
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
@@ -387,6 +372,7 @@ def confusion_matrix(prediction_info):
 
 def main():
     dataset = load_data()
+
     split_data = dataset_split(dataset[0], dataset[1])
 
     """
@@ -407,7 +393,7 @@ def main():
 
     v_loss.append(NBNF[0].history['val_loss'][0])
     t_loss.append(1)
-    # t_loss.append(NBNF[0].history['loss'][0])
+    t_loss.append(NBNF[0].history['loss'][0])
 
 
     
