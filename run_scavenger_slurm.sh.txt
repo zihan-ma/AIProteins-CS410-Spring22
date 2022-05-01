@@ -7,9 +7,16 @@
 # adding a second # (e.g. ##SBATCH lines will not be processed
 # by the scheduler).
 #
+
+#lines below edit is the lines edit from orgional
+
 #
 # set name of job
-#SBATCH --job-name=slurm-sample
+##SBATCH --job-name=slurm-sample
+
+# edit
+#SBATCH --job-name=AIPorteins
+
 #
 # set the number of processors/tasks needed
 #SBATCH -n 2
@@ -18,6 +25,10 @@
 #if not used then default will be used
 # for scavenger users, use this format:
 ##SBATCH --account=pi_first.last
+
+#edit
+#SBATCH --account=zihan.ma001
+
 # for contributing users, use this format:
 ##SBATCH --account=<deptname|lastname>
 
