@@ -17,7 +17,7 @@ def disulfide_parser():
     cys_pdb_list = np.empty((0, 3, 3))
 
     # Make sure to change directory to where PDBs are
-    path = "C:\\Users\\name\\AIProteins-CS410-Spring22\\PDBs"
+    path = "C:\\Users\\francisco\\AIProteins-CS410-Spring22\\PDBs"
     dir_list = os.listdir(path)
     for x in dir_list:
         if x.endswith(".pdb"):
@@ -215,3 +215,79 @@ def utility_shuffel3D(nocys: np.ndarray, cys: np.ndarray):
 
 
     return (nocys, cys)
+
+def saveToFile(data: tuple, path=""):
+
+    # get labels
+    label0 = data[0][0]
+    label1 = data[1][0]
+    
+    # get features
+    raw_features0 = data[0][1]
+    print(raw_features0.shape)
+    print(raw_features0)
+    raw_features1 = data[1][1]
+
+    h0, w0, d0 = raw_features0.shape
+    h1, w1, d1 = raw_features1.shape
+
+    original_shape_info = np.array([[label0, h0, w0, d0], [label1, h1, w1, d1]])
+    reshaped_raw_features0_data = raw_features0.reshape(raw_features0.shape[0], -1)
+    reshaped_raw_features1_data = raw_features1.reshape(raw_features1.shape[0], -1)
+    
+    np.savetxt(path + "shapeInfoFile.txt", original_shape_info)
+    np.savetxt(path + "nocysParsedDataFile.txt", reshaped_raw_features0_data)
+    np.savetxt(path + "cysParsedDataFile.txt", reshaped_raw_features1_data)
+
+    print("Executing data integrity check")
+    if not integrityCheck(raw_features0, raw_features1):
+        print("WARNING: Original Array and stored arrays are not identical")
+    else:
+        print("Integrity check: PASSED")
+
+def loadFromFile():
+    loaded_shape = np.loadtxt("shapeInfoFile.txt")
+    nocys_info = loaded_shape[0]
+    nocys_label = nocys_info[0]
+    h0 = int(nocys_info[1])
+    w0 = int(nocys_info[2])
+    d0 = int(nocys_info[3])
+
+
+    cys_info = loaded_shape[1]
+    cys_label = cys_info[0]
+    h1 = int(cys_info[1])
+    w1 = int(cys_info[2])
+    d1 = int(cys_info[3])
+
+    loaded_nocys_data = np.loadtxt("nocysParsedDataFile.txt")
+    loaded_cys_data = np.loadtxt("cysParsedDataFile.txt")
+
+    loaded_nocys_data = loaded_nocys_data.reshape(loaded_nocys_data.shape[0], loaded_nocys_data.shape[1] // d0, d0)
+    loaded_cys_data = loaded_cys_data.reshape(loaded_cys_data.shape[0], loaded_cys_data.shape[1] // d1, d1)
+
+def integrityCheck(orignal_nocys: np.ndarray, orignal_cys: np.ndarray, path="") -> bool:
+    loaded_nocys_data = np.loadtxt(path + "nocysParsedDataFile.txt")
+    loaded_cys_data = np.loadtxt(path + "cysParsedDataFile.txt")
+
+    loaded_nocys_data = loaded_nocys_data.reshape(loaded_nocys_data.shape[0], loaded_nocys_data.shape[1] // orignal_nocys.shape[2], orignal_nocys.shape[2])
+    loaded_cys_data = loaded_cys_data.reshape(loaded_cys_data.shape[0], loaded_cys_data.shape[1] // orignal_cys.shape[2], orignal_cys.shape[2])
+
+    # print("Checking if stored np arrays are identical to the original np arrays...")
+    
+    # check the shapes:
+    # print("shape of orignal nocys data: ", orignal_nocys.shape)
+    # print("shape of stored nocys data: ", loaded_nocys_data.shape)
+    # check the shapes:
+    # print("shape of orignal cys data: ", orignal_cys.shape)
+    # print("shape of stored cys data: ", loaded_cys_data.shape)
+  
+    # check if both arrays are same or not:
+    if (orignal_nocys == loaded_nocys_data).all() and (orignal_cys == loaded_cys_data).all():
+        return True
+    else:
+        return False
+
+
+#saveToFile(disulfide_parser())
+#loadFromFile()
