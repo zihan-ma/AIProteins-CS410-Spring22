@@ -41,6 +41,8 @@ def parse_pdb_lines(lines):
         if l[:4] != "ATOM":
             continue
         chain, resNo, atom, aa = l[21:22], int(l[22:26]), ' '+l[12:16].strip().ljust(3), l[17:20]
+        if pdb_idx == []:
+            return []
         idx = pdb_idx.index((chain,resNo))
         for i_atm, tgtatm in enumerate(util.aa2long[util.aa2num[aa]]):
             if tgtatm is not None and tgtatm.strip() == atom.strip(): # ignore whitespace

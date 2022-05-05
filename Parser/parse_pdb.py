@@ -4,7 +4,7 @@ import numpy as np
 def parse(filename):
     pdb = parser.parse_pdb(filename)
     if pdb == []:
-        return []
+        return np.array([])
     shape = pdb['idx'].shape[0]
     # has_ssbond = 0
     for cys in pdb['ssbond']:

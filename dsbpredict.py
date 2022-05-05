@@ -73,7 +73,7 @@ if args.parse:
         parsedpath = cwd + parsed_fp + fullname
         if not (fullname in parsed and os.path.getmtime(rawpath) < os.path.getmtime(parsedpath)):
             data = parser.parse(pdbpath)
-            if data != []:
+            if not np.array_equiv(np.array([]), data):
                 if not args.silent:
                     print(name, "parsed")
                 np.savetxt(parsedpath, data)
