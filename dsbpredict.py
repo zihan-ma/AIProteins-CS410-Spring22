@@ -8,9 +8,9 @@ import gzip
 
 # directories
 cwd = os.getcwd()
-raw_fp = "/Data/raw/"
-pdb_fp = "/Data/pdb/"
-parsed_fp = "/Data/parsed/"
+raw_fp = "/Data/Raw/"
+pdb_fp = "/Data/PDB/"
+parsed_fp = "/Data/Parsed/"
 # has_ss = "has-ssbond/"
 # no_ss = "no-ssbond/"
 
