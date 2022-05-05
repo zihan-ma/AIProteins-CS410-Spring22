@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# PDB related files
+*.ent.gz
+*.pdb
+*.pars
+.listing
