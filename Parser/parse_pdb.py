@@ -1,4 +1,4 @@
-import Parser.util.parser as parser
+import Parser.Util.parser as parser
 import numpy as np
 
 def parse(filename):
