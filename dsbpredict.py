@@ -45,7 +45,7 @@ if args.unzip:
         if not pdb.endswith(zip_ext):
             continue
         name = pdb[:pdb.find(zip_ext)]
-        fullname = name + ".pdb"
+        fullname = name + pdb_ext
         rawpath = cwd + raw_fp + pdb
         pdbpath = cwd + pdb_fp + fullname
         if not (fullname in unzipped and os.path.getmtime(rawpath) < os.path.getmtime(pdbpath)):
