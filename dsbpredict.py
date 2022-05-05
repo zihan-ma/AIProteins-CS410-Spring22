@@ -11,6 +11,9 @@ cwd = os.getcwd()
 raw_fp = "/Data/Raw/"
 pdb_fp = "/Data/PDB/"
 parsed_fp = "/Data/Parsed/"
+zip_ext = ".ent.gz"
+pdb_ext = ".pdb"
+parse_ext = ".pars"
 # has_ss = "has-ssbond/"
 # no_ss = "no-ssbond/"
 
@@ -39,9 +42,9 @@ if args.unzip:
     zipped = os.listdir(cwd + raw_fp)
     unzipped = os.listdir(cwd + pdb_fp)
     for pdb in zipped:
-        if not pdb.endswith(".ent.gz"):
+        if not pdb.endswith(zip_ext):
             continue
-        name = pdb.removesuffix(".ent.gz")
+        name = pdb[:pdb.find(zip_ext)]
         fullname = name + ".pdb"
         rawpath = cwd + raw_fp + pdb
         pdbpath = cwd + pdb_fp + fullname
@@ -61,11 +64,11 @@ if args.parse:
     unzipped = os.listdir(cwd + pdb_fp)
     parsed = os.listdir(cwd + parsed_fp)
     for pdb in unzipped:
-        if not pdb.endswith(".pdb"):
+        if not pdb.endswith(pdb_ext):
             continue
-        name = pdb.removesuffix(".pdb")
-        fullname = name + ".pars"
-        rawpath = cwd + raw_fp + name + ".ent.gz"
+        name = pdb[:pdb.find(pdb_ext)]
+        fullname = name + parse_ext
+        rawpath = cwd + raw_fp + name + zip_ext
         pdbpath = cwd + pdb_fp + pdb
         parsedpath = cwd + parsed_fp + fullname
         if not (fullname in parsed and os.path.getmtime(rawpath) < os.path.getmtime(parsedpath)):
