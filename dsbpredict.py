@@ -138,5 +138,5 @@ if args.organize:
                     shutil.copyfile(parsed_path, sparse_ss_path)
         except ValueError:
             if not args.silent:
-                print(" corrupted, removing")
+                print("corrupted, removing")
             os.remove(parsed_path)
