@@ -3,7 +3,8 @@ import torch
 import Parser.Util.parser as parser
 import Parser.Util.geometry as geometry
 
-type = [
+# numpy values needed for .csv input/output
+csv_type = [
     ('dist', np.float64), 
     ('omega', np.float64), 
     ('theta', np.float64), 
@@ -14,7 +15,9 @@ type = [
     ('chain2', (np.str_,1)),
     ('res2', np.int32)
 ]
+csv_format = ['%f','%f','%f','%f','%d','%s','%d','%s','%d']
 
+# parse a PDB file, extracting cysteine information
 def parse(filename):
     pdb = parser.parse_pdb(filename)
     if pdb == []:
@@ -48,7 +51,7 @@ def parse(filename):
                 val.append(idx[i][1])
                 val.append(idx[j][0])
                 val.append(idx[j][1])
-                structd = np.array(tuple(val), dtype=type)
+                structd = np.array(tuple(val), dtype=csv_type)
                 c6d.append(structd)
             j += 1
         i += 1

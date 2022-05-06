@@ -33,10 +33,7 @@ if not (args.download or args.unzip or args.parse or args.organize):
     exit(0)
 if args.download:
     os.makedirs(os.path.dirname(cwd + raw_fp), exist_ok=True)
-    if args.silent:
-        proc = subprocess.Popen('/bin/bash', text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=sys.stderr)
-    else:
-        proc = subprocess.Popen('/bin/bash', text=True, stdin=subprocess.PIPE, stdout=sys.stdout, stderr=sys.stderr)
+    proc = subprocess.Popen('/bin/bash', text=True, stdin=subprocess.PIPE, stdout=sys.stdout, stderr=sys.stderr)
     proc.communicate('Data/download.sh')
 if args.unzip:
     os.makedirs(os.path.dirname(cwd + pdb_fp), exist_ok=True)
@@ -83,7 +80,7 @@ if args.parse:
             else:
                 if not args.silent:
                     print("parse successful")
-                np.savetxt(parsed_path, data, fmt=['%f','%f','%f','%f','%d','%s','%d','%s','%d'], delimiter=',')
+                np.savetxt(parsed_path, data, fmt=parser.csv_format, delimiter=',')
         else:
             if not args.silent:
                 print(name, "already parsed")
@@ -100,7 +97,7 @@ if args.organize:
         parsed_path = cwd + parsed_fp + pdb
         have_ss_path = cwd + have_ss_fp + pdb
         no_ss_path = cwd + no_ss_fp + pdb
-        pdb_data = np.loadtxt(parsed_path, dtype=parser.type, delimiter=',')
+        pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
         has_ss = False
         if pdb_data.shape == ():
             pdb_data = np.array([pdb_data])
