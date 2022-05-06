@@ -98,6 +98,7 @@ if args.organize:
     os.makedirs(os.path.dirname(cwd + rich_ss_fp), exist_ok=True)
     os.makedirs(os.path.dirname(cwd + sparse_ss_fp), exist_ok=True)
     os.makedirs(os.path.dirname(cwd + no_ss_fp), exist_ok=True)
+    zipped = os.listdir(cwd + raw_fp)
     parsed = os.listdir(cwd + parsed_fp)
     rich_ss = os.listdir(cwd + rich_ss_fp)
     sparse_ss = os.listdir(cwd + sparse_ss_fp)
@@ -106,37 +107,42 @@ if args.organize:
         if not pdb.endswith(parse_ext):
             continue
         name = pdb[:pdb.find(parse_ext)]
+        raw_path = cwd + raw_fp + name + zip_ext
         parsed_path = cwd + parsed_fp + pdb
         rich_ss_path = cwd + rich_ss_fp + pdb
         sparse_ss_path = cwd + sparse_ss_fp + pdb
         no_ss_path = cwd + no_ss_fp + pdb
         if not args.silent:
-            print(name, end=" ")
-        try:
-            pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
-            ss = 0
-            nss = 0
-            if pdb_data.shape == ():
-                pdb_data = np.array([pdb_data])
-            for line in pdb_data:
-                if line[4] == 1:
-                    ss += 1
+                print(name, end=" ")
+        if not (pdb in (rich_ss + sparse_ss + no_ss) and os.path.getmtime(raw_path) < os.path.getmtime(parsed_path)):
+            try:
+                pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
+                ss = 0
+                nss = 0
+                if pdb_data.shape == ():
+                    pdb_data = np.array([pdb_data])
+                for line in pdb_data:
+                    if line[4] == 1:
+                        ss += 1
+                    else:
+                        nss += 1
+                if ss == 0:
+                    if not args.silent:
+                        print("has no disulfide bond")
+                    shutil.copyfile(parsed_path, no_ss_path)
                 else:
-                    nss += 1
-            if ss == 0:
+                    if 10*ss >= nss:
+                        if not args.silent:
+                            print("has high disulfide density")
+                        shutil.copyfile(parsed_path, rich_ss_path)
+                    else:
+                        if not args.silent:
+                            print("has low disulfide density")
+                        shutil.copyfile(parsed_path, sparse_ss_path)
+            except ValueError:
                 if not args.silent:
-                    print("has no disulfide bond")
-                shutil.copyfile(parsed_path, no_ss_path)
-            else:
-                if 10*ss >= nss:
-                    if not args.silent:
-                        print("has high disulfide density")
-                    shutil.copyfile(parsed_path, rich_ss_path)
-                else:
-                    if not args.silent:
-                        print("has low disulfide density")
-                    shutil.copyfile(parsed_path, sparse_ss_path)
-        except ValueError:
+                    print("corrupted, removing")
+                os.remove(parsed_path)
+        else:
             if not args.silent:
-                print("corrupted, removing")
-            os.remove(parsed_path)
+                print("already sorted")
