@@ -110,6 +110,8 @@ if args.organize:
         rich_ss_path = cwd + rich_ss_fp + pdb
         sparse_ss_path = cwd + sparse_ss_fp + pdb
         no_ss_path = cwd + no_ss_fp + pdb
+        if not args.silent:
+            print(name, end=" ")
         pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
         ss = 0
         nss = 0
@@ -122,14 +124,14 @@ if args.organize:
                 nss += 1
         if ss == 0:
             if not args.silent:
-                print(name, "has no disulfide bond")
+                print("has no disulfide bond")
             shutil.copyfile(parsed_path, no_ss_path)
         else:
             if 10*ss >= nss:
                 if not args.silent:
-                    print(name, "has high disulfide density")
+                    print("has high disulfide density")
                 shutil.copyfile(parsed_path, rich_ss_path)
             else:
                 if not args.silent:
-                    print(name, "has low disulfide density")
+                    print("has low disulfide density")
                 shutil.copyfile(parsed_path, sparse_ss_path)
