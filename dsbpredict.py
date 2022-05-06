@@ -112,26 +112,31 @@ if args.organize:
         no_ss_path = cwd + no_ss_fp + pdb
         if not args.silent:
             print(name, end=" ")
-        pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
-        ss = 0
-        nss = 0
-        if pdb_data.shape == ():
-            pdb_data = np.array([pdb_data])
-        for line in pdb_data:
-            if line[4] == 1:
-                ss += 1
+        try:
+            pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
+            ss = 0
+            nss = 0
+            if pdb_data.shape == ():
+                pdb_data = np.array([pdb_data])
+            for line in pdb_data:
+                if line[4] == 1:
+                    ss += 1
+                else:
+                    nss += 1
+            if ss == 0:
+                if not args.silent:
+                    print("has no disulfide bond")
+                shutil.copyfile(parsed_path, no_ss_path)
             else:
-                nss += 1
-        if ss == 0:
+                if 10*ss >= nss:
+                    if not args.silent:
+                        print("has high disulfide density")
+                    shutil.copyfile(parsed_path, rich_ss_path)
+                else:
+                    if not args.silent:
+                        print("has low disulfide density")
+                    shutil.copyfile(parsed_path, sparse_ss_path)
+        except ValueError:
             if not args.silent:
-                print("has no disulfide bond")
-            shutil.copyfile(parsed_path, no_ss_path)
-        else:
-            if 10*ss >= nss:
-                if not args.silent:
-                    print("has high disulfide density")
-                shutil.copyfile(parsed_path, rich_ss_path)
-            else:
-                if not args.silent:
-                    print("has low disulfide density")
-                shutil.copyfile(parsed_path, sparse_ss_path)
+                print(" corrupted, removing")
+            os.remove(parsed_path)
