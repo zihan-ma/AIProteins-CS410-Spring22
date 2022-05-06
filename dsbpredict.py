@@ -19,7 +19,6 @@ parse_ext = ".csv"
 argp = argparse.ArgumentParser()
 argp.add_argument("-d", "--download", action="store_true", help="check the PDB for updates, or download the PDB; zipped files are stored in Data/raw")
 argp.add_argument("-u", "--unzip", action="store_true", help="unzip the compressed downloaded PDB files; unzipped files are stored in Data/pdb")
-# argp.add_argument("-p", "--parse", action="store_true", help="parse the pdb files and categorize them based on ssbonds; output files are stored in Data/parsed")
 argp.add_argument("-p", "--parse", action="store_true", help="parse the pdb files; output files are stored in Data/parsed")
 argp.add_argument("-s", "--silent", action="store_true", help="suppress runtime information")
 args = argp.parse_args()
