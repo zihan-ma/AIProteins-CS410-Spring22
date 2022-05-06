@@ -115,34 +115,34 @@ if args.organize:
         if not args.silent:
                 print(name, end=" ")
         if not (pdb in (rich_ss + sparse_ss + no_ss) and os.path.getmtime(raw_path) < os.path.getmtime(parsed_path)):
-            try:
-                pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
-                ss = 0
-                nss = 0
-                if pdb_data.shape == ():
-                    pdb_data = np.array([pdb_data])
-                for line in pdb_data:
-                    if line[4] == 1:
-                        ss += 1
-                    else:
-                        nss += 1
-                if ss == 0:
-                    if not args.silent:
-                        print("has no disulfide bond")
-                    shutil.copyfile(parsed_path, no_ss_path)
+            # try:
+            pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
+            ss = 0
+            nss = 0
+            if pdb_data.shape == ():
+                pdb_data = np.array([pdb_data])
+            for line in pdb_data:
+                if line[4] == 1:
+                    ss += 1
                 else:
-                    if 10*ss >= nss:
-                        if not args.silent:
-                            print("has high disulfide density")
-                        shutil.copyfile(parsed_path, rich_ss_path)
-                    else:
-                        if not args.silent:
-                            print("has low disulfide density")
-                        shutil.copyfile(parsed_path, sparse_ss_path)
-            except ValueError:
+                    nss += 1
+            if ss == 0:
                 if not args.silent:
-                    print("corrupted, removing")
-                os.remove(parsed_path)
+                    print("has no disulfide bond")
+                shutil.copyfile(parsed_path, no_ss_path)
+            else:
+                if 10*ss >= nss:
+                    if not args.silent:
+                        print("has high disulfide density")
+                    shutil.copyfile(parsed_path, rich_ss_path)
+                else:
+                    if not args.silent:
+                        print("has low disulfide density")
+                    shutil.copyfile(parsed_path, sparse_ss_path)
+            # except ValueError:
+            #     if not args.silent:
+            #         print("corrupted, removing")
+            #     os.remove(parsed_path)
         else:
             if not args.silent:
                 print("already sorted")
