@@ -13,9 +13,7 @@ pdb_fp = "/Data/PDB/"
 parsed_fp = "/Data/Parsed/"
 zip_ext = ".ent.gz"
 pdb_ext = ".pdb"
-parse_ext = ".pars"
-# has_ss = "has-ssbond/"
-# no_ss = "no-ssbond/"
+parse_ext = ".csv"
 
 # parsing command line arguments
 argp = argparse.ArgumentParser()
@@ -72,14 +70,17 @@ if args.parse:
         pdbpath = cwd + pdb_fp + pdb
         parsedpath = cwd + parsed_fp + fullname
         if not (fullname in parsed and os.path.getmtime(rawpath) < os.path.getmtime(parsedpath)):
+            if not args.silent:
+                print(name,end=" ")
             data = parser.parse(pdbpath)
-            if not np.array_equiv(np.array([]), data):
-                if not args.silent:
-                    print(name, "parsed")
-                np.savetxt(parsedpath, data)
+            if np.array_equiv(np.array([1]), data) and not args.silent:
+                print("parse failed")
+            elif np.array_equiv(np.array([2]), data) and not args.silent:
+                print("has no CYS residues")
             else:
                 if not args.silent:
-                    print(name,"has no relevant residues")
+                    print("parse successful")
+                np.savetxt(parsedpath, data, fmt=['%f','%f','%f','%f','%d','%s','%d','%s','%d'], delimiter=',')
         else:
             if not args.silent:
-                print(name,"already parsed")
+                print(name, "already parsed")

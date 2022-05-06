@@ -131,5 +131,5 @@ dmypy.json
 # PDB related files
 *.ent.gz
 *.pdb
-*.pars
 .listing
+pdb*.csv
