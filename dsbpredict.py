@@ -61,29 +61,38 @@ if args.parse:
     zipped = os.listdir(cwd + raw_fp)
     unzipped = os.listdir(cwd + pdb_fp)
     parsed = os.listdir(cwd + parsed_fp)
-    for pdb in unzipped:
-        if not pdb.endswith(pdb_ext):
-            continue
-        name = pdb[:pdb.find(pdb_ext)]
-        fullname = name + parse_ext
-        raw_path = cwd + raw_fp + name + zip_ext
-        pdb_path = cwd + pdb_fp + pdb
-        parsed_path = cwd + parsed_fp + fullname
-        if not (fullname in parsed and os.path.getmtime(raw_path) < os.path.getmtime(parsed_path)):
-            if not args.silent:
-                print(name,end=" ")
-            data = parser.parse(pdb_path)
-            if np.array_equiv(np.array([1]), data) and not args.silent:
-                print("parse failed")
-            elif np.array_equiv(np.array([2]), data) and not args.silent:
-                print("has no CYS residues")
+    failed_fp = cwd + parsed_fp + "failed.csv"
+    open(failed_fp, "a")
+    with open(cwd + parsed_fp + "failed.csv", "r+") as f:
+        failed = f.readlines()
+        for pdb in unzipped:
+            if not pdb.endswith(pdb_ext):
+                continue
+            name = pdb[:pdb.find(pdb_ext)]
+            fullname = name + parse_ext
+            raw_path = cwd + raw_fp + name + zip_ext
+            pdb_path = cwd + pdb_fp + pdb
+            parsed_path = cwd + parsed_fp + fullname
+            if not (fullname in parsed and os.path.getmtime(raw_path) < os.path.getmtime(parsed_path)) and name+'\n' not in failed:
+                if not args.silent:
+                    print(name, end=" ")
+                errc, data = parser.parse(pdb_path)
+                if errc == 1 and not args.silent:
+                    print("parse failed")
+                    f.write(name + '\n')
+                elif errc == 2 and not args.silent:
+                    print("has no CYS residues")
+                    f.write(name + '\n')
+                elif errc == 3 and not args.silent:
+                    print("has no bondable CYS residues")
+                    f.write(name + '\n')
+                else:
+                    if not args.silent:
+                        print("parse successful")
+                    np.savetxt(parsed_path, data, fmt=parser.csv_format, delimiter=',')
             else:
                 if not args.silent:
-                    print("parse successful")
-                np.savetxt(parsed_path, data, fmt=parser.csv_format, delimiter=',')
-        else:
-            if not args.silent:
-                print(name, "already parsed")
+                    print(name, "already parsed")
 if args.organize:
     os.makedirs(os.path.dirname(cwd + have_ss_fp), exist_ok=True)
     os.makedirs(os.path.dirname(cwd + no_ss_fp), exist_ok=True)

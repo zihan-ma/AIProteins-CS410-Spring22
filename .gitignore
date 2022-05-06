@@ -133,3 +133,4 @@ dmypy.json
 *.pdb
 .listing
 pdb*.csv
+failed.csv

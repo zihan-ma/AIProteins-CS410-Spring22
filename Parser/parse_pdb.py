@@ -21,7 +21,7 @@ csv_format = ['%f','%f','%f','%f','%d','%s','%d','%s','%d']
 def parse(filename):
     pdb = parser.parse_pdb(filename)
     if pdb == []:
-        return np.array([1])
+        return (1 , [])
     ssbond = pdb['ssbond']
     xyz = []
     idx = []
@@ -32,7 +32,7 @@ def parse(filename):
             idx.append(pdb['idx'][i])
             res.append(pdb['res'][i])
     if xyz == []:
-        return np.array([2])
+        return (2, [])
     xyz = np.array(xyz)
     xyz_ref = torch.tensor(xyz[:,:3,:]).float()
     c6d_ref = geometry.xyz_to_c6d(xyz_ref[None].permute(0,2,1,3),{'DMAX':20.0}).numpy()
@@ -55,4 +55,7 @@ def parse(filename):
                 c6d.append(structd)
             j += 1
         i += 1
-    return c6d
+    if c6d == []:
+        return (3, [])
+    else:
+        return (0, c6d)
