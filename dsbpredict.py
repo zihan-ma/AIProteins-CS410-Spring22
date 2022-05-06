@@ -12,7 +12,8 @@ cwd = os.getcwd()
 raw_fp = "/Data/Raw/"
 pdb_fp = "/Data/PDB/"
 parsed_fp = "/Data/Parsed/"
-have_ss_fp = "/Data/Have_SS/"
+rich_ss_fp = "/Data/Rich_SS/"
+sparse_ss_fp = "/Data/Sparse_SS/"
 no_ss_fp = "/Data/No_SS/"
 zip_ext = ".ent.gz"
 pdb_ext = ".pdb"
@@ -23,7 +24,7 @@ argp = argparse.ArgumentParser()
 argp.add_argument("-d", "--download", action="store_true", help="check the PDB for updates, or download the PDB; zipped files are stored in Data/raw")
 argp.add_argument("-u", "--unzip", action="store_true", help="unzip the compressed downloaded PDB files; unzipped files are stored in Data/pdb")
 argp.add_argument("-p", "--parse", action="store_true", help="parse the pdb files; output files are stored in Data/parsed")
-argp.add_argument("-o", "--organize", action="store_true", help="sort parsed pdb files on existence of a disulfide bonds")
+argp.add_argument("-o", "--organize", action="store_true", help="sort parsed pdb files on disulfide bonds")
 argp.add_argument("-s", "--silent", action="store_true", help="suppress runtime information")
 args = argp.parse_args()
 
@@ -50,12 +51,12 @@ if args.unzip:
             with gzip.open(raw_path, "rt") as infile:
                 content = infile.read()
             if not args.silent:
-                print("unzipping", name)
+                print(name, "unzipping")
             with open(pdb_path, "w") as outfile:
                 outfile.write(content)
         else:
             if not args.silent:
-                print(name,"up to date")
+                print(name, "up to date")
 if args.parse:
     os.makedirs(os.path.dirname(cwd + parsed_fp), exist_ok=True)
     zipped = os.listdir(cwd + raw_fp)
@@ -94,31 +95,41 @@ if args.parse:
                 if not args.silent:
                     print(name, "already parsed")
 if args.organize:
-    os.makedirs(os.path.dirname(cwd + have_ss_fp), exist_ok=True)
+    os.makedirs(os.path.dirname(cwd + rich_ss_fp), exist_ok=True)
+    os.makedirs(os.path.dirname(cwd + sparse_ss_fp), exist_ok=True)
     os.makedirs(os.path.dirname(cwd + no_ss_fp), exist_ok=True)
     parsed = os.listdir(cwd + parsed_fp)
-    have_ss = os.listdir(cwd + have_ss_fp)
+    rich_ss = os.listdir(cwd + rich_ss_fp)
+    sparse_ss = os.listdir(cwd + sparse_ss_fp)
     no_ss = os.listdir(cwd + no_ss_fp)
     for pdb in parsed:
         if not pdb.endswith(parse_ext):
             continue
         name = pdb[:pdb.find(parse_ext)]
         parsed_path = cwd + parsed_fp + pdb
-        have_ss_path = cwd + have_ss_fp + pdb
+        rich_ss_path = cwd + rich_ss_fp + pdb
+        sparse_ss_path = cwd + sparse_ss_fp + pdb
         no_ss_path = cwd + no_ss_fp + pdb
         pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
-        has_ss = False
+        ss = 0
+        nss = 0
         if pdb_data.shape == ():
             pdb_data = np.array([pdb_data])
         for line in pdb_data:
-            if line[4] == 0:
-                has_ss = True
-                break
-        if has_ss:
-            if not args.silent:
-                print(name, "has a disulfide bond")
-            shutil.copyfile(parsed_path, have_ss_path)
-        else:
+            if line[4] == 1:
+                ss += 1
+            else:
+                nss += 1
+        if ss == 0:
             if not args.silent:
                 print(name, "has no disulfide bond")
             shutil.copyfile(parsed_path, no_ss_path)
+        else:
+            if 10*ss >= nss:
+                if not args.silent:
+                    print(name, "has high disulfide density")
+                shutil.copyfile(parsed_path, rich_ss_path)
+            else:
+                if not args.silent:
+                    print(name, "has low disulfide density")
+                shutil.copyfile(parsed_path, sparse_ss_path)
