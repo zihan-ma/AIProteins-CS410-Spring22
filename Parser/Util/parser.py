@@ -1,9 +1,7 @@
 # code modified from https://github.com/RosettaCommons/RFDesign/tree/main/hallucination/util/parsers.py
 
 import numpy as np
-import torch
 import Parser.Util.util as util
-import Parser.Util.geometry as geometry
 
 to1letter = {
     "ALA":'A', "ARG":'R', "ASN":'N', "ASP":'D', "CYS":'C',

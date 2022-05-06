@@ -1,3 +1,5 @@
+# code modified from https://github.com/RosettaCommons/RFDesign/tree/main/hallucination/util/util.py
+
 import numpy as np
 import torch
 
