@@ -77,8 +77,6 @@ if args.parse:
     with open(failed_fp, "r+") as f:
         failed = f.readlines()
         for pdb in unzipped:
-            if not pdb.endswith(pdb_ext):
-                continue
             name = pdb[:pdb.find(pdb_ext)]
             fullname = name + parse_ext
             raw_path = cwd + raw_fp + name + zip_ext
@@ -121,7 +119,7 @@ if args.organize:
         sparse_ss_path = cwd + sparse_ss_fp + pdb
         no_ss_path = cwd + no_ss_fp + pdb
         if not args.silent:
-                print(name, end=" ")
+            print(name, end=" ")
         if not (pdb in (rich_ss + sparse_ss + no_ss) and os.path.getmtime(raw_path) < os.path.getmtime(parsed_path)):
             pdb_data = np.loadtxt(parsed_path, dtype=parser.csv_type, delimiter=',')
             ss = 0
