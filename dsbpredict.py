@@ -72,9 +72,9 @@ if args.parse:
     unzipped.sort()
     parsed = os.listdir(cwd + parsed_fp)
     parsed.sort()
-    failed_fp = cwd + parsed_fp + "failed.csv"
+    failed_fp = cwd + "/Data/failed.csv"
     open(failed_fp, "a")
-    with open(cwd + parsed_fp + "failed.csv", "r+") as f:
+    with open(failed_fp, "r+") as f:
         failed = f.readlines()
         for pdb in unzipped:
             if not pdb.endswith(pdb_ext):
@@ -114,8 +114,6 @@ if args.organize:
     no_ss = os.listdir(cwd + no_ss_fp)
     no_ss.sort()
     for pdb in parsed:
-        if pdb == "failed.csv":
-            continue
         name = pdb[:pdb.find(parse_ext)]
         raw_path = cwd + raw_fp + name + zip_ext
         parsed_path = cwd + parsed_fp + pdb
