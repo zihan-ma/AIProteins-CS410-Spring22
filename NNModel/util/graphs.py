@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from .helper import util_helper
 import numpy as np
 
-
 """
 
     Graphing Functions
@@ -20,7 +19,9 @@ def parameter_tuning(v_loss, t_loss, title):
     plt.xlabel("Model")
     plt.ylabel("Loss")
     plt.legend(loc='upper right')
-    plt.show()
+    #plt.show()
+    plt.savefig('util/graph_output//parameterTuning.png')
+    plt.close()
 
 def learning_curve(learn_info): # for batch learning
     plt.plot(learn_info[0])
@@ -29,7 +30,9 @@ def learning_curve(learn_info): # for batch learning
     plt.xlabel("Samples")
     plt.ylabel("Cost")
     plt.legend(['train', 'loss'], loc='upper left')
-    plt.show()
+    #plt.show()
+    plt.savefig('util/graph_output//learningCurve.png')
+    plt.close()
 
 def confusion_matrix(prediction_info):
     y_pred = prediction_info[0]
@@ -51,7 +54,9 @@ def confusion_matrix(prediction_info):
     #ax.yaxis.set_ticklabels(["""FILL IN"""])
 
     # Display the visualization of the Confusion Matrix.
-    plt.show()
+    #plt.show()
+    plt.savefig('util/graph_output//confusionMatrix.png')
+    plt.close()
 
 def multi_roc_graph(prediction_info1, prediction_info2, extra=""):
     y_pred1 = prediction_info1[4]
@@ -82,7 +87,9 @@ def multi_roc_graph(prediction_info1, prediction_info2, extra=""):
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
     plt.legend(loc="lower right")
-    plt.show()
+    # plt.show()
+    plt.savefig('util/graph_output//multiROC.png')
+    plt.close()
 
 def roc_graph(prediction_info, extra=""):
     y_pred = prediction_info[4]
@@ -101,4 +108,6 @@ def roc_graph(prediction_info, extra=""):
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
     plt.legend(loc="lower right")
-    plt.show()
+    #plt.show()
+    plt.savefig("util/graph_output/ROC.png")
+    plt.close()

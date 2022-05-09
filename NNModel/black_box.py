@@ -29,7 +29,6 @@ def load_data():
     
 
     labels = np.copy(data[:, 4])
-    print(labels)
 
     return [features, labels]
 
