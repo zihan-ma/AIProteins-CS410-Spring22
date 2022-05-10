@@ -1,3 +1,5 @@
+# code modified from https://github.com/RosettaCommons/RFDesign/tree/main/hallucination/util/geometry.py
+
 import numpy as np
 import torch
 
@@ -12,7 +14,7 @@ def get_pair_dist(a, b):
     Returns
     -------
     dist : pytorch tensor of shape [batch,nres,nres]
-           stores paitwise distances between atoms in a and b
+           stores pairwise distances between atoms in a and b
     """
 
     dist = torch.cdist(a, b, p=2)
@@ -22,7 +24,6 @@ def get_pair_dist(a, b):
 def get_ang(a, b, c):
     """calculate planar angles for all consecutive triples (a[i],b[i],c[i])
     from Cartesian coordinates of three sets of atoms a,b,c 
-
     Parameters
     ----------
     a,b,c : pytorch tensors of shape [batch,nres,3]
@@ -53,7 +54,6 @@ def get_ang(a, b, c):
 def get_dih(a, b, c, d):
     """calculate dihedral angles for all consecutive quadruples (a[i],b[i],c[i],d[i])
     given Cartesian coordinates of four sets of atoms a,b,c,d
-
     Parameters
     ----------
     a,b,c,d : pytorch tensors of shape [batch,nres,3]

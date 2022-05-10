@@ -1,4 +1,4 @@
-import sys
+# code modified from https://github.com/RosettaCommons/RFDesign/tree/main/hallucination/util/util.py
 
 import numpy as np
 import torch
@@ -21,7 +21,7 @@ aa123 = {aa1: aa3 for aa1, aa3 in zip(alpha_1, num2aa)}
 aa321 = {aa3: aa1 for aa1, aa3 in zip(alpha_1, num2aa)}
 
 def N_to_AA(x):
-    x = np.array(x);
+    x = np.array(x)
     if x.ndim == 1: x = x[None]
     return ["".join([aa_N_1.get(a,"-") for a in y]) for y in x]
 
